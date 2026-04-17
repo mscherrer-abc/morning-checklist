@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Morning Check-in">
+<title>Morning Check-in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F3EE;
+    --surface: #FDFCFA;
+    --surface2: #EFECEA;
+    --border: rgba(0,0,0,0.09);
+    --border-mid: rgba(0,0,0,0.14);
+    --text: #1A1916;
+    --text-2: #6B6860;
+    --text-3: #A09D99;
+    --green: #1A7F5A;
+    --green-bg: #E6F4EE;
+    --amber: #A05C00;
+    --amber-bg: #FEF3E2;
+    --red: #A02020;
+    --red-bg: #FDECEC;
+    --accent: #2B5CE6;
+    --font-mono: 'DM Mono', monospace;
+    --font-sans: 'DM Sans', sans-serif;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151412;
+      --surface: #1E1C19;
+      --surface2: #282521;
+      --border: rgba(255,255,255,0.08);
+      --border-mid: rgba(255,255,255,0.13);
+      --text: #F0EDE8;
+      --text-2: #9B9790;
+      --text-3: #5E5B57;
+      --green: #3DB87F;
+      --green-bg: #0D2B1F;
+      --amber: #E8A030;
+      --amber-bg: #2A1E08;
+      --red: #E05555;
+      --red-bg: #2A0F0F;
+      --accent: #6B8EF5;
+    }
+  }
+
+  html { font-family: var(--font-sans); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; }
+
+  body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 60px; }
+
+  .app { width: 100%; max-width: 560px; }
+
+  /* Header */
+  .top-bar { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+  .heading { font-size: 22px; font-weight: 500; color: var(--text); letter-spacing: -0.3px; }
+  .date-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+  /* Timer */
+  .timer-card { background: var(--surface); border: 0.5px solid var(--border-mid); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px; }
+  .timer-num { font-family: var(--font-mono); font-size: 28px; font-weight: 500; color: var(--text); min-width: 72px; letter-spacing: -0.5px; transition: color 0.3s; }
+  .timer-num.warn { color: var(--amber); }
+  .timer-num.over { color: var(--red); }
+  .timer-actions { display: flex; gap: 6px; }
+  .t-btn { font-family: var(--font-sans); font-size: 12px; font-weight: 500; color: var(--text-2); background: var(--surface2); border: 0.5px solid var(--border); border-radius: 6px; padding: 5px 12px; cursor: pointer; transition: background 0.15s, color 0.15s; }
+  .t-btn:hover { background: var(--border); color: var(--text); }
+  .t-btn.primary { background: var(--accent); color: #fff; border-color: transparent; }
+  .t-btn.primary:hover { opacity: 0.88; }
+  .prog-block { flex: 1; }
+  .prog-track { height: 3px; background: var(--surface2); border-radius: 99px; overflow: hidden; margin-bottom: 5px; }
+  .prog-fill { height: 100%; background: var(--green); border-radius: 99px; transition: width 0.25s ease; }
+  .prog-text { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+
+  /* Sections */
+  .section { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 8px; overflow: hidden; }
+  .sec-head { display: flex; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; user-select: none; background: var(--surface); transition: background 0.12s; }
+  .sec-head:hover { background: var(--surface2); }
+  .sec-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .sec-label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-2); flex: 1; }
+  .sec-alloc { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); background: var(--surface2); border: 0.5px solid var(--border); border-radius: 99px; padding: 2px 7px; }
+  .sec-count { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); min-width: 28px; text-align: right; }
+  .chev { font-size: 9px; color: var(--text-3); transition: transform 0.15s; }
+  .section.collapsed .chev { transform: rotate(-90deg); }
+  .section.collapsed .items { display: none; }
+
+  .items { border-top: 0.5px solid var(--border); }
+  .item { display: flex; align-items: flex-start; gap: 11px; padding: 10px 14px; border-bottom: 0.5px solid var(--border); cursor: pointer; transition: background 0.12s; }
+  .item:last-child { border-bottom: none; }
+  .item:hover { background: var(--surface2); }
+  .cb { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--border-mid); flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
+  .item.done .cb { background: var(--green); border-color: var(--green); }
+  .ck { display: none; color: #fff; font-size: 10px; font-weight: 700; }
+  .item.done .ck { display: block; }
+  .item-text { font-size: 14px; color: var(--text); line-height: 1.5; flex: 1; transition: color 0.12s; }
+  .item.done .item-text { color: var(--text-3); text-decoration: line-through; text-decoration-color: var(--border-mid); }
+
+  /* Footer */
+  .footer { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+  .foot-hint { font-size: 12px; color: var(--text-3); }
+  .reset-btn { font-family: var(--font-sans); font-size: 12px; color: var(--text-3); background: none; border: 0.5px solid var(--border); border-radius: 6px; padding: 5px 11px; cursor: pointer; }
+  .reset-btn:hover { background: var(--surface2); color: var(--text-2); }
+
+  .done-banner { display: none; text-align: center; margin-top: 14px; padding: 13px 16px; background: var(--green-bg); border: 0.5px solid var(--green); border-radius: var(--radius-lg); font-size: 14px; color: var(--green); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top-bar">
+    <div>
+      <div class="heading">Morning check-in</div>
+      <div class="date-label" id="dateLabel"></div>
+    </div>
+  </div>
+
+  <div class="timer-card">
+    <div class="timer-num" id="timerNum">15:00</div>
+    <div class="prog-block">
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-text" id="progText">0 / 0 complete</div>
+    </div>
+    <div class="timer-actions">
+      <button class="t-btn primary" id="timerBtn" onclick="toggleTimer()">Start</button>
+      <button class="t-btn" onclick="resetTimer()">Reset</button>
+    </div>
+  </div>
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="foot-hint">Scans only — dig deeper async</span>
+    <button class="reset-btn" onclick="resetAll()">Reset day</button>
+  </div>
+  <div class="done-banner" id="doneBanner">All done. Go run the day.</div>
+</div>
+
+<script>
+const SECTIONS = [
+  {
+    id: "comms", label: "Comms triage", alloc: "3 min", dot: "#378ADD",
+    items: [
+      { id: "c1", text: "Any fires in email or Slack? Flag, don\u2019t respond yet." },
+      { id: "c2", text: "Identify your 3 must-reply messages before noon." },
+    ]
+  },
+  {
+    id: "delivery", label: "Delivery health", alloc: "4 min", dot: "#1A7F5A",
+    items: [
+      { id: "d1", text: "Any project at risk \u2014 scope, timeline, or client satisfaction?" },
+      { id: "d2", text: "Does anything need your direct intervention today?" },
+      { id: "d3", text: "All client-facing moments today are covered and prepped?" },
+    ]
+  },
+  {
+    id: "people", label: "People & talent", alloc: "3 min", dot: "#7F77DD",
+    items: [
+      { id: "p1", text: "Anyone on the bench or rolling off soon? Utilization gaps?" },
+      { id: "p2", text: "Any open reqs or candidates stalling? Keep the loop moving." },
+    ]
+  },
+  {
+    id: "bd", label: "Pipeline & BD", alloc: "2 min", dot: "#BA7517",
+    items: [
+      { id: "b1", text: "Any proposals, SOWs, or follow-ups due today?" },
+    ]
+  },
+  {
+    id: "plan", label: "Today\u2019s priorities", alloc: "3 min", dot: "#888780",
+    items: [
+      { id: "x1", text: "What are your 3 outcomes for today? (Not tasks \u2014 outcomes.)" },
+      { id: "x2", text: "Anything you\u2019re avoiding that needs a decision today?" },
+    ]
+  }
+];
+
+const state = {};
+SECTIONS.forEach(s => s.items.forEach(i => state[i.id] = false));
+
+const today = new Date();
+document.getElementById("dateLabel").textContent =
+  today.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+
+let secs = 15 * 60, running = false, iv = null;
+
+function fmt(s) {
+  const neg = s < 0; const abs = Math.abs(s);
+  return (neg ? "-" : "") + Math.floor(abs / 60) + ":" + String(abs % 60).padStart(2, "0");
+}
+
+function updateTimer() {
+  const el = document.getElementById("timerNum");
+  el.textContent = fmt(secs);
+  el.className = "timer-num" + (secs < 0 ? " over" : secs < 180 ? " warn" : "");
+}
+
+function toggleTimer() {
+  running = !running;
+  document.getElementById("timerBtn").textContent = running ? "Pause" : "Resume";
+  if (running) { iv = setInterval(() => { secs--; updateTimer(); }, 1000); }
+  else { clearInterval(iv); }
+}
+
+function resetTimer() {
+  clearInterval(iv); running = false; secs = 15 * 60;
+  document.getElementById("timerBtn").textContent = "Start";
+  updateTimer();
+}
+
+function totalItems() { return SECTIONS.reduce((a, s) => a + s.items.length, 0); }
+function doneCount() { return Object.values(state).filter(Boolean).length; }
+
+function render() {
+  const c = document.getElementById("sections");
+  c.innerHTML = "";
+  SECTIONS.forEach(s => {
+    const doneIn = s.items.filter(i => state[i.id]).length;
+    const el = document.createElement("div");
+    el.className = "section";
+    el.id = "sec-" + s.id;
+    el.innerHTML = `
+      <div class="sec-head" onclick="toggleSec('${s.id}')">
+        <span class="sec-dot" style="background:${s.dot}"></span>
+        <span class="sec-label">${s.label}</span>
+        <span class="sec-alloc">${s.alloc}</span>
+        <span class="sec-count">${doneIn}/${s.items.length}</span>
+        <span class="chev">&#9660;</span>
+      </div>
+      <div class="items">${s.items.map(i => `
+        <div class="item${state[i.id] ? " done" : ""}" id="item-${i.id}" onclick="toggle('${i.id}')">
+          <div class="cb"><span class="ck">&#10003;</span></div>
+          <div class="item-text">${i.text}</div>
+        </div>`).join("")}
+      </div>`;
+    c.appendChild(el);
+  });
+  updateProgress();
+}
+
+function toggle(id) {
+  state[id] = !state[id];
+  document.getElementById("item-" + id).classList.toggle("done", state[id]);
+  updateProgress(); updateBadges();
+}
+
+function toggleSec(id) { document.getElementById("sec-" + id).classList.toggle("collapsed"); }
+
+function updateBadges() {
+  SECTIONS.forEach(s => {
+    const el = document.getElementById("sec-" + s.id);
+    if (el) el.querySelector(".sec-count").textContent = s.items.filter(i => state[i.id]).length + "/" + s.items.length;
+  });
+}
+
+function updateProgress() {
+  const done = doneCount(), total = totalItems();
+  document.getElementById("progFill").style.width = (total ? Math.round(done / total * 100) : 0) + "%";
+  document.getElementById("progText").textContent = done + " / " + total + " complete";
+  document.getElementById("doneBanner").style.display = (done === total && total > 0) ? "block" : "none";
+}
+
+function resetAll() { Object.keys(state).forEach(k => state[k] = false); resetTimer(); render(); }
+
+render(); updateTimer();
+</script>
+</body>
+</html>
