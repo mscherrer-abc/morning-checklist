@@ -148,7 +148,7 @@ const SECTIONS = [
   {
     id: "comms", label: "Comms triage", alloc: "3 min", dot: "#378ADD",
     items: [
-      { id: "c1", text: "Any fires in email or Slack? Flag, don\u2019t respond yet." },
+      { id: "c1", text: "Any fires in email or Teams? Flag, don\u2019t respond yet." },
       { id: "c2", text: "Identify your 3 must-reply messages before noon." },
     ]
   },
@@ -174,7 +174,28 @@ const SECTIONS = [
     ]
   },
   {
-    id: "plan", label: "Today\u2019s priorities", alloc: "3 min", dot: "#888780",
+    id: "influence", label: "Deal influence", alloc: "2 min", dot: "#D85A30",
+    items: [
+      { id: "i1", text: "Which managed service or project deal most needs your personal attention today?" },
+      { id: "i2", text: "One relationship touch, insight, or move you can make today to advance it?" },
+    ]
+  },
+  {
+    id: "horizon", label: "Horizon scan", alloc: "2 min", dot: "#5DCAA5",
+    items: [
+      { id: "h1", text: "What\u2019s coming in the 30, 60, 90 days across clients, projects, and teams you can get ahead of now?" },
+      { id: "h2", text: "Any resourcing, delivery, or relationship moments approaching that need proactive setup?" },
+    ]
+  },
+  {
+    id: "accountability", label: "Team accountability", alloc: "1 min", dot: "#7F77DD",
+    items: [
+      { id: "a1", text: "Did commitments made yesterday or last week get followed through on?" },
+      { id: "a2", text: "Anyone who needs a nudge, a blocker removed, or a standard reinforced today?" },
+    ]
+  },
+  {
+    id: "plan", label: "Today\u2019s priorities", alloc: "2 min", dot: "#888780",
     items: [
       { id: "x1", text: "What are your 3 outcomes for today? (Not tasks \u2014 outcomes.)" },
       { id: "x2", text: "Anything you\u2019re avoiding that needs a decision today?" },
